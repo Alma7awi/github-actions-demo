@@ -12,31 +12,29 @@ jobs:
 
     steps:
       # Step 1: Checkout repository
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Step 2: Install Rye (or you can skip if you just want pip)
-      - name: Install Rye
-        run: |
-          curl -sSf https://rye.astral.sh/get | bash
-          echo "$HOME/.rye/shims" >> $GITHUB_PATH
-        env:
-          RYE_VERSION: '0.44.0'
-          RYE_INSTALL_OPTION: '--yes'
+      # Step 2: Set up Python
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: rye sync --all-features
-
-      # Step 4: Run your script
+      # Step 3: Run your script
       - name: Run hello.py
-        run: rye run python hello.py
+        run: python hello.py
 
-      # Step 5: Call OpenAI API using secret
-      - name: Call OpenAI API
+      # Step 4: Install OpenAI library
+      - name: Install OpenAI
+        run: pip install --upgrade openai
+
+      # Step 5: Verify OpenAI secret and call OpenAI
+      - name: Verify OpenAI secret and call OpenAI
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          rye run python - <<'EOF'
+          python - <<'EOF'
           import os
           import openai
 
@@ -45,6 +43,7 @@ jobs:
               raise ValueError("OPENAI_API_KEY is missing!")
           print("OpenAI API key is present ✔")
 
+          # Call OpenAI API with system + user prompts
           response = openai.ChatCompletion.create(
               model="gpt-4o-mini",
               messages=[
