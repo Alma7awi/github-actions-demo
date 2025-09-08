@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      # Step 3: Run your script
+      # Step 3: Run hello.py (your existing script)
       - name: Run hello.py
         run: python hello.py
 
@@ -29,32 +29,8 @@ jobs:
       - name: Install OpenAI
         run: pip install --upgrade openai
 
-      # Step 5: Verify OpenAI secret and call OpenAI
-      - name: Verify OpenAI secret and call OpenAI
+      # Step 5: Run hello_openai.py to verify secret and call OpenAI
+      - name: Run OpenAI demo
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python - <<'EOF'
-          import os
-          import openai
-
-          key = os.environ.get("OPENAI_API_KEY")
-          if not key:
-              raise ValueError("OPENAI_API_KEY is missing!")
-          print("OpenAI API key is present ✔")
-
-          # Safely call OpenAI API
-          try:
-              response = openai.ChatCompletion.create(
-                  model="gpt-4o-mini",
-                  messages=[
-                      {"role": "system", "content": "You are a helpful GitHub Actions assistant."},
-                      {"role": "user", "content": "Say hello from GitHub Actions!"}
-                  ],
-                  api_key=key
-              )
-              print("OpenAI response:", response.choices[0].message.content)
-          except Exception as e:
-              print("OpenAI call failed, but workflow continues:", e)
-          EOF
-
+        run: python hello_openai.py
