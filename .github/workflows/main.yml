@@ -29,18 +29,32 @@ jobs:
       - name: Install OpenAI
         run: pip install --upgrade openai
 
-      # Step 5: Verify OpenAI API key
-      - name: Verify OpenAI secret
+      # Step 5: Verify OpenAI API key and call OpenAI
+      - name: Verify OpenAI secret and call OpenAI
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python - <<'EOF'
           import os
+          import openai
+
           key = os.environ.get("OPENAI_API_KEY")
-          if key:
-              print("OpenAI API key is present ✔")
-          else:
+          if not key:
               raise ValueError("OPENAI_API_KEY is missing!")
+          print("OpenAI API key is present ✔")
+
+          # Call OpenAI API with system + user prompts
+          try:
+              response = openai.ChatCompletion.create(
+                  model="gpt-4o-mini",
+                  messages=[
+                      {"role": "system", "content": "You are a helpful GitHub Actions assistant."},
+                      {"role": "user", "content": "Say hello from GitHub Actions!"}
+                  ],
+                  api_key=key
+              )
+              print("OpenAI response:", response.choices[0].message.content)
+          except Exception as e:
+              print("OpenAI call failed:", e)
+              raise
           EOF
-
-
