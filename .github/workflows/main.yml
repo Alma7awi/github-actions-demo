@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      # Step 3: Run hello.py (your existing script)
+      # Step 3: Run hello.py
       - name: Run hello.py
         run: python hello.py
 
@@ -29,8 +29,8 @@ jobs:
       - name: Install OpenAI
         run: pip install --upgrade openai
 
-      # Step 5: Run hello_openai.py to verify secret and call OpenAI
+      # Step 5: Run call_openai.py to verify secret and call OpenAI
       - name: Run OpenAI demo
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python hello_openai.py
+        run: python call_openai.py
