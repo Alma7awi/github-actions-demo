@@ -11,14 +11,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # Step 3: Run your existing Python script
       - name: Run Python script
         run: python hello.py
+
+      # Step 4: Install OpenAI library
+      - name: Install dependencies
+        run: pip install openai
+
+      # Step 5: Call OpenAI API
+      - name: Call OpenAI API
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python - <<'EOF'
+          from openai import OpenAI
+          import os
+          client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+          response = client.chat.completions.create(
+              model="gpt-4o-mini",
+              messages=[{"role": "user", "content": "Say hello from GitHub Actions!"}]
+          )
+          print("OpenAI API response:", response.choices[0].message.content)
+          EOF
+
 
