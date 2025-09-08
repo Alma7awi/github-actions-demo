@@ -29,7 +29,7 @@ jobs:
       - name: Install OpenAI
         run: pip install --upgrade openai
 
-      # Step 5: Verify OpenAI secret and safely call OpenAI
+      # Step 5: Verify OpenAI secret and call OpenAI
       - name: Verify OpenAI secret and call OpenAI
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -57,3 +57,4 @@ jobs:
           except Exception as e:
               print("OpenAI call failed, but workflow continues:", e)
           EOF
+
