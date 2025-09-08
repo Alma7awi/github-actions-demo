@@ -27,22 +27,34 @@ jobs:
 
       # Step 4: Install OpenAI library
       - name: Install dependencies
-        run: pip install openai
+  run: pip install --upgrade openai
+
 
       # Step 5: Call OpenAI API
-      - name: Call OpenAI API
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          python - <<'EOF'
-          from openai import OpenAI
-          import os
-          client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-          response = client.chat.completions.create(
-              model="gpt-4o-mini",
-              messages=[{"role": "user", "content": "Say hello from GitHub Actions!"}]
-          )
-          print("OpenAI API response:", response.choices[0].message.content)
-          EOF
+     - name: Call OpenAI API
+  env:
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  run: |
+    python - <<'EOF'
+    import openai, os
+
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        raise ValueError("OPENAI_API_KEY is missing!")
+
+    print("OpenAI API key is present ✔")
+
+    # Make a tiny request just to check connectivity
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": "Hello from GitHub Actions"}],
+            api_key=key
+        )
+        print("Response received:", response.choices[0].message.content)
+    except Exception as e:
+        print("OpenAI call failed:", e)
+        raise
+    EOF
 
 
